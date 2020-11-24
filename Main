@@ -1,0 +1,186 @@
+// arrays cus i dont want to flood the code with vars
+Star[] stars = new Star[400];
+boolean[] gbool = {true, false, false, false, false, false, false, false, false};
+float [] gf = {400, 400, 3, 4, 0, };
+int[] gi = {0, 0, 0, 1, 350, 6, 350, 20};
+String arg = "";
+
+void setup() {
+  size(800, 800);
+  for (int i = 0; i < stars.length; i++) {
+    stars[i] = new Star();
+  }
+}
+
+void draw() {
+  noStroke();
+  background(0);
+
+
+  // Start screen
+  if (!gbool[3]) {
+    background(0);
+    fill(0, 255, 0);
+    textSize(50);
+    text("ping", 320, 200, 200);
+    rect(290, 400, 200, 50);
+    if (mouseX >= 290 && mouseX <= 490 && mouseY >= 400 && mouseY <= 450 && mousePressed) {
+      gbool[3] = true;
+    }
+  }
+
+  if (gbool[3] && !gbool[7]) {
+    // Timer mechanism
+    gi[0]++;
+    if (gi[0] == 60) {
+      gi[0] = 0;
+      gi[1]++;
+    }
+
+    // stars graphics
+    for (int i = 0; i < stars.length; i++) {
+      stars[i].update();
+      stars[i].show();
+    }
+
+    // level system
+    switch (gi[1]) {
+    case 30:
+      if (gi[3] < 2) {
+        gi[3]++;
+      }
+      break;
+    case 60:
+      if (gi[3] < 3) {
+        gi[3]++;
+      }
+      break;
+    case 90:
+      if (gi[3] < 4) {
+        gi[3]++;
+      }
+      break;
+    case 120:
+      if (gi[3] <5) {
+        gi[3]++;
+      }
+      break;
+    case 150:
+      gbool[4] = true;
+      break;
+    }
+
+    // switch for increments of the speed yes!
+    switch (gi[5]) {
+    case 2: 
+      gf[2] = 4;
+      gf[3] = 6;
+      break;
+    case 3:
+      gf[2] = 6;
+      gf[3] = 7;
+      break;
+    case 4:
+      gf[2] = 8;
+      gf[3] = 9;
+      break;
+    }
+
+    // Graphics (worst part)
+    fill(0, 0, 255);
+    // left paddle (you)
+    rect(20, gi[6], 30, 100);
+    // right paddle ("BOT")
+    fill(255, 0, 0);
+    gf[4] = gf[1 ] - 30;
+    rect(750, gf[4], 30, 100);
+    // ball
+    fill(0, 255, 0);
+    ellipse(gf[0], gf[1], 50, 50);
+
+    // Text
+    textSize(20);
+    text("LEVEL " + gi[3], 370, 40);
+    text("Timer: " + gi[1], 370, 60, 200, 200);
+
+    // Game gamge gamge gmeagmeg emgaegmag
+    if (keyPressed && key == 'w' && gi[6] >= 20) {
+      gi[6] = gi[6] - gi[5];
+    }  
+    if (keyPressed && key == 's'  && gi[6] <= 700) {
+      gi[6] = gi[6] + gi[5];
+    }
+    // Ball mechanics
+    if (gbool[0]) {
+      gf[0] = gf[0] + gf[2];
+    } else {
+      gf[0] = gf[0] - gf[2];
+    }
+    if (gbool[1]) {
+      gf[1] = gf[1] + gf[3];
+    } else {
+      gf[1] = gf[1] - gf[3];
+    }
+
+    if (gf[1] <= 10) {
+      gbool[1] = true;
+    }
+    if (gf[1] >= 770) {
+      gbool[1] = false;
+    }
+    if (gf[0] >= 740) {
+      gbool[0] = false;
+    }
+    if (gf[0] <= 10) {
+      gbool[4] = true;
+    }
+    if (dist(gi[7], gi[6], gf[0], gf[1]) < 85 && (dist(gi[7], gi[6], gf[0], gf[1]) > 65)) {
+      gbool[0] = true;
+    }
+    if (gbool[4]) {
+      background(0);
+      textSize(60);
+      fill(255, 0, 0);
+      text("GAME OVER", 200, 200);
+    }
+  }
+  if (key == 'p') {
+    pause();
+  }
+}
+
+void pause() {
+  boolean pause = false;
+  // for pause screen / console (for admin commands
+  pause = true;
+  if (pause) { 
+    background(0);
+    fill(0, 255, 0);
+    text("PAUSED", 200, 200);
+    text(arg, 200, 300);
+
+    if (keyCode == ENTER) {
+      switch(arg) {
+      case "admin":
+        gbool[8] = true;
+        break;
+      case "help":
+        text("For admin commands, type admin", 200, 400);
+        break;
+      default:
+        text("Unknown command", 200, 400);
+      }
+    }
+  }
+}
+
+
+void keyTyped() {
+  if (key >= 'A' && key <= 'Ø' || key == ' '|| key >= '0' && key <= '9' || key >= '!' && key <= '_') { 
+    arg = arg + key;
+  }
+}
+
+void keyPressed() {
+  if (keyCode == BACKSPACE && arg.length()>0) arg = arg.substring(0, arg.length()-1);
+}
